@@ -8,11 +8,6 @@ import (
 
 var regExpr = regexp.MustCompile(`[-a-zA-Zа-яА-Я]+`)
 
-type wordCount struct {
-	word  string
-	count int
-}
-
 func Top10(text string) []string {
 	if len(text) == 0 {
 		return []string{}
@@ -26,30 +21,27 @@ func Top10(text string) []string {
 		resultWord := regExpr.FindString(strings.ToLower(word))
 		wordsCountMap[resultWord]++
 	}
-	wordCountSlice := make([]wordCount, len(wordsCountMap))
+	wordSlice := make([]string, len(wordsCountMap))
 	var counter int
-	for word, count := range wordsCountMap {
-		wordCountSlice[counter] = wordCount{word, count}
+	for word := range wordsCountMap {
+		wordSlice[counter] = word
 		counter++
 	}
-	sort.Slice(wordCountSlice, func(i, j int) bool {
-		if wordCountSlice[i].count > wordCountSlice[j].count {
+	sort.Slice(wordSlice, func(i, j int) bool {
+		if wordsCountMap[wordSlice[i]] > wordsCountMap[wordSlice[j]] {
 			return true
 		}
-		if wordCountSlice[i].count == wordCountSlice[j].count && wordCountSlice[i].word < wordCountSlice[j].word {
+		if wordsCountMap[wordSlice[i]] == wordsCountMap[wordSlice[j]] && wordSlice[i] < wordSlice[j] {
 			return true
 		}
 		return false
 	})
-	var length int
-	if len(wordCountSlice) >= 10 {
-		length = 10
-	} else {
-		length = len(wordCountSlice)
+	if len(wordSlice) < 10 {
+		return wordSlice
 	}
-	result := make([]string, length)
-	for i := 0; i < length; i++ {
-		result[i] = wordCountSlice[i].word
+	result := make([]string, 10)
+	for i := 0; i < 10; i++ {
+		result[i] = wordSlice[i]
 	}
 
 	return result
