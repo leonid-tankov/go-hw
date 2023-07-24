@@ -7,7 +7,7 @@ import (
 )
 
 // Change to true if needed.
-var taskWithAsteriskIsCompleted = false
+var taskWithAsteriskIsCompleted = true
 
 var text = `Как видите, он  спускается  по  лестнице  вслед  за  своим
 	другом   Кристофером   Робином,   головой   вниз,  пересчитывая
@@ -79,4 +79,38 @@ func TestTop10(t *testing.T) {
 			require.Equal(t, expected, Top10(text))
 		}
 	})
+
+	tests := []struct {
+		name     string
+		input    string
+		expected []string
+	}{
+		{
+			name:     "test ' and not top 10",
+			input:    `нога 'нога' а, он он ты ты что что`,
+			expected: []string{"нога", "он", "ты", "что", "а"},
+		},
+		{
+			name:     "test hyphenated word and not top 10",
+			input:    `какой-то какойто какойто`,
+			expected: []string{"какойто", "какой-то"},
+		},
+		{
+			name:     "test with multiple spaces and not top 10",
+			input:    `он   он     ты`,
+			expected: []string{"он", "ты"},
+		},
+		{
+			name:     "test only hyphen",
+			input:    `-`,
+			expected: []string{},
+		},
+	}
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			result := Top10(tc.input)
+			require.Equal(t, tc.expected, result)
+		})
+	}
 }
