@@ -12,12 +12,21 @@ var (
 	ErrUnsupportedFile       = errors.New("unsupported file")
 	ErrOffsetExceedsFileSize = errors.New("offset exceeds file size")
 	ErrNegativeArgument      = errors.New("one of the arguments is negative")
-	BufferSize               = 100
+	ErrRootWriting           = errors.New("attempt to write to the root folder")
+	ErrSamePath              = errors.New("to and from paths are the same")
 )
 
 func Copy(fromPath, toPath string, offset, limit int64) error {
 	if offset < 0 || limit < 0 {
 		return ErrNegativeArgument
+	}
+
+	if strings.HasPrefix(toPath, "/root") {
+		return ErrRootWriting
+	}
+
+	if fromPath == toPath {
+		return ErrSamePath
 	}
 
 	fileInfo, err := os.Stat(fromPath)
@@ -52,10 +61,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	if (limit > fileSize-offset) || (limit == 0) {
 		limit = fileSize - offset
 	}
-	bSize := BufferSize
-	if BufferSize > int(limit) {
-		bSize = int(limit)
-	}
+	bSize := getBufSize(limit)
 	buf := make([]byte, bSize)
 	fmt.Println("Start copying")
 	for i := 1; i <= int(limit); i += bSize {
@@ -81,4 +87,17 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	}
 	fmt.Println("\nComplete copying")
 	return nil
+}
+
+func getBufSize(limit int64) int {
+	switch {
+	case limit < 1048576: // < 1MB
+		return int(limit / 2)
+	case limit >= 1048576 && limit < 1073741824: // from 1MB to 1GB
+		return int(limit / 2000)
+	case limit >= 1073741824: // > 1GB
+		return int(limit / 2000000)
+	default:
+		return int(limit)
+	}
 }

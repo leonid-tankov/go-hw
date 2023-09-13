@@ -12,6 +12,21 @@ import (
 func TestCopy(t *testing.T) {
 	cmp := equalfile.New(nil, equalfile.Options{})
 
+	t.Run("non-existent from file", func(t *testing.T) {
+		err := Copy("testdata/input-222.txt", "output.txt", 0, 0)
+		require.Error(t, err, "no error %q", err)
+	})
+
+	t.Run("root writing", func(t *testing.T) {
+		err := Copy("testdata/input.txt", "/root/output.txt", 0, 0)
+		require.Truef(t, errors.Is(err, ErrRootWriting), "actual error %q", err)
+	})
+
+	t.Run("the same input and output", func(t *testing.T) {
+		err := Copy("testdata/input.txt", "testdata/input.txt", 0, 0)
+		require.Truef(t, errors.Is(err, ErrSamePath), "actual error %q", err)
+	})
+
 	t.Run("negative argument", func(t *testing.T) {
 		tmpFile, _ := os.CreateTemp("", "tmp_file.txt")
 		defer os.Remove(tmpFile.Name())
