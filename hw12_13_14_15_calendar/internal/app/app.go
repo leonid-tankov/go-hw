@@ -2,25 +2,24 @@ package app
 
 import (
 	"context"
+
+	"github.com/leonid-tankov/go-hw/hw12_13_14_15_calendar/internal/models"
+	"github.com/leonid-tankov/go-hw/hw12_13_14_15_calendar/internal/repository"
 )
 
-type App struct { // TODO
+type App struct {
+	logger  repository.Logger
+	storage repository.Storage
 }
 
-type Logger interface { // TODO
+func New(logger repository.Logger, storage repository.Storage) *App {
+	return &App{
+		logger:  logger,
+		storage: storage,
+	}
 }
 
-type Storage interface { // TODO
-}
-
-func New(logger Logger, storage Storage) *App {
-	return &App{}
-}
-
-func (a *App) CreateEvent(ctx context.Context, id, title string) error {
-	// TODO
+func (a *App) CreateEvent(ctx context.Context, event *models.Event) error {
 	return nil
 	// return a.storage.CreateEvent(storage.Event{ID: id, Title: title})
 }
-
-// TODO
