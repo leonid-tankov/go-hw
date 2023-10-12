@@ -1,3 +1,4 @@
+//go:build !bench
 // +build !bench
 
 package hw10programoptimization
@@ -35,5 +36,21 @@ func TestGetDomainStat(t *testing.T) {
 		result, err := GetDomainStat(bytes.NewBufferString(data), "unknown")
 		require.NoError(t, err)
 		require.Equal(t, DomainStat{}, result)
+	})
+
+	errorData := `
+{"Id":1,"Name":"Howard Mendoza","Username":"0Oliver","Email":"aliquid_qui_ea@Browsedrive.gov","Phone":"6-866-899-36-79","Password":"InAQJvsq","Address":"Blackbird Place 25"}
+{"Id":2,"Name":"Jesse Vasquez","Username":"qRichardson","Email":"mLynchbroWsecat.com","Phone":"9-373-949-64-00","Password":"SiZLeNSGn","Address":"Fulton Hill 80"}
+`
+
+	t.Run("find 'gov' in error data", func(t *testing.T) {
+		result, err := GetDomainStat(bytes.NewBufferString(errorData), "gov")
+		require.NoError(t, err)
+		require.Equal(t, DomainStat{"browsedrive.gov": 1}, result)
+	})
+
+	t.Run("find 'com' in error data", func(t *testing.T) {
+		_, err := GetDomainStat(bytes.NewBufferString(errorData), "com")
+		require.Error(t, err)
 	})
 }
